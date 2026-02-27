@@ -1,26 +1,31 @@
-from flask import Flask
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
 from models import db
 from routes.users import users_bp
 from routes.ads import ads_bp
-from routes.media import media_bp   
+from routes.media import media_bp
 
 
 def create_app():
     app = Flask(__name__)
 
-    # Database config
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nova.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///nova.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Initialize extensions
     db.init_app(app)
-    CORS(app)  # allow React to talk to Flask
+    CORS(app, resources={r"/api/*": {"origins": os.getenv('CORS_ORIGINS', '*')}})
 
-    # Register routes
     app.register_blueprint(users_bp, url_prefix="/api/users")
     app.register_blueprint(ads_bp, url_prefix="/api/ads")
-    app.register_blueprint(media_bp, url_prefix="/api/media")  # ✅ ADD IT HERE
+    app.register_blueprint(media_bp, url_prefix="/api/media")
+
+    @app.get('/api/health')
+    def health_check():
+        return jsonify({"status": "ok"})
+
+    with app.app_context():
+        db.create_all()
 
     return app
 
