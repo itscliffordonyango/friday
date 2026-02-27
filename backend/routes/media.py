@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models import db, Media
 
-media_bp = Blueprint("media", __name__, url_prefix="/api/media")
+media_bp = Blueprint("media", __name__)
 
 
 @media_bp.route("/", methods=["GET"])
@@ -12,10 +12,14 @@ def get_all_media():
 
 @media_bp.route("/", methods=["POST"])
 def create_media():
-    data = request.json
+    data = request.get_json(silent=True) or {}
+
+    title = data.get("title", "").strip()
+    if not title:
+        return jsonify({"error": "title is required"}), 400
 
     media = Media(
-        title=data["title"],
+        title=title,
         description=data.get("description"),
         genre=data.get("genre"),
         year=data.get("year"),
