@@ -1,0 +1,5 @@
+{
+  "name": "Rewind - Retro Streaming & Ad-Supported VOD",
+  "description": "A production-grade nostalgia streaming platform featuring HLS video delivery, a complex AVOD ad-insertion engine, personalized recommendations using Gemini, and a full admin dashboard for campaign management.",
+  "requestFramePermissions": []
+}
